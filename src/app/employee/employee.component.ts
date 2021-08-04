@@ -14,6 +14,10 @@ export class EmployeeComponent implements OnInit {
   departments: any = [];
   employees: any = [];
 
+  EmployeeIdFilter = '';
+  EmployeeNameFilter = '';
+  employeesWithouthFilter: any = [];
+
   modalTitle = '';
   EmployeeId = 0;
   EmployeeName = '';
@@ -29,6 +33,7 @@ export class EmployeeComponent implements OnInit {
   refreshList() {
     this.http.get<any>(environment.API_URL + 'employee').subscribe((data) => {
       this.employees = data;
+      this.employeesWithouthFilter = data;
     });
   }
 
@@ -100,5 +105,34 @@ export class EmployeeComponent implements OnInit {
       .subscribe((data: any) => {
         this.PhotoFileName = data.toString();
       });
+  }
+
+  FilterFn() {
+    var DepartmentIdFilter = this.EmployeeIdFilter;
+    var DepartmentNameFilter = this.EmployeeNameFilter;
+
+    this.departments = this.employeesWithouthFilter.filter(function (el: any) {
+      return (
+        el.DepartmentId.toString()
+          .toLowerCase()
+          .includes(DepartmentIdFilter.toString().trim().toLowerCase()) &&
+        el.DepartmentName.toString()
+          .toLowerCase()
+          .includes(DepartmentNameFilter.toString().trim().toLowerCase())
+      );
+    });
+  }
+
+  sortResult(prop: any, asc: any) {
+    this.departments = this.employeesWithouthFilter.sort(function (
+      a: any,
+      b: any
+    ) {
+      if (asc) {
+        return a[prop] > b[prop] ? 1 : a[prop] < b[prop] ? -1 : 0;
+      } else {
+        return b[prop] > a[prop] ? 1 : b[prop] < a[prop] ? -1 : 0;
+      }
+    });
   }
 }
